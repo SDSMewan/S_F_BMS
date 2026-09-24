@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>Seeman Foods Management System</title>
+<link rel="stylesheet" href="style.css">
+<script>
+const CONFIG = {
+  WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwPRr22tq9M2RInr7cWmAewMI9e_nOVtfHLZ4FZ3jZroBpxcI-RZhTiMgoQgb44NniAoQ/exec"
+};
+</script>
+</head>
+<body>
+
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="logo">SF</div>
+    <h1>Seeman Foods</h1>
+    <p>Business Management System</p>
+    <form id="loginForm">
+      <label>Username</label>
+      <input id="loginUsername" required autocomplete="username">
+      <label>Password</label>
+      <div class="pw-wrap"><input id="loginPassword" type="password" required autocomplete="current-password"><button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">Show</button></div>
+      <button id="loginButton" class="btn primary full" type="submit">Log in</button>
+    </form>
+    <div id="loginMessage"></div><div id="connectionStatus" class="connection-status"></div>
+  </div>
+</div>
+
+<div id="appPage" class="hidden">
+  <div id="backdrop" class="backdrop"></div>
+  <aside id="sidebar" class="sidebar">
+    <div class="brand"><div class="logo small">SF</div><div><b>Seeman Foods</b><small>Management System</small></div></div>
+    <nav>
+      <button class="nav active" data-page="dashboard">📊 Dashboard</button>
+      <button class="nav" data-page="sales">💰 Sales</button>
+      <button class="nav" data-page="costs">💸 Costs</button>
+      <button class="nav" data-page="customers">👥 Customers</button>
+      <button class="nav" data-page="orders">📦 Orders</button>
+      <button class="nav" data-page="payments">💳 Payments</button>
+      <button class="nav" data-page="receipts">🧾 Pay Receipts</button>
+      <button class="nav admin-only" data-page="users">👤 User Management</button>
+      <button class="nav admin-only" data-page="income">📈 Monthly Income</button>
+    </nav>
+    <button id="logoutButton" class="logout">🚪 Logout</button>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><button id="mobileMenu" class="hamburger" aria-label="Open menu">☰</button><span id="pageTitle">Dashboard</span></div>
+      <div><span id="currentUserName"></span><span id="currentUserRole" class="badge"></span></div>
+    </header>
+
+    <section id="page-dashboard" class="page active">
+      <div class="heading"><div><h1>Dashboard</h1><p>Seeman Foods business overview</p></div><button class="btn primary" onclick="loadDashboard()">Refresh</button></div>
+      <div class="cards">
+        <div class="card"><span>💰</span><small>Monthly Sales</small><strong id="dSales">Rs. 0.00</strong></div>
+        <div class="card"><span>💸</span><small>Monthly Costs</small><strong id="dCosts">Rs. 0.00</strong></div>
+        <div class="card"><span>📈</span><small>Net Profit</small><strong id="dProfit">Rs. 0.00</strong></div>
+        <div class="card"><span>💳</span><small>Pending Payments</small><strong id="dPayments">0</strong></div>
+        <div class="card"><span>📦</span><small>Active Orders</small><strong id="dOrders">0</strong></div>
+      </div>
+      <div class="two-col">
+        <div class="panel"><div class="panel-head"><h2>Recent Sales</h2><button class="btn small" onclick="openPage('sales')">View</button></div><div id="recentSales"></div></div>
+        <div class="panel"><div class="panel-head"><h2>Recent Costs</h2><button class="btn small" onclick="openPage('costs')">View</button></div><div id="recentCosts"></div></div>
+      </div>
+    </section>
+
+    <section id="page-sales" class="page"><div id="salesModule"></div></section>
+    <section id="page-costs" class="page"><div id="costsModule"></div></section>
+    <section id="page-customers" class="page"><div id="customersModule"></div></section>
+    <section id="page-orders" class="page"><div id="ordersModule"></div></section>
+    <section id="page-payments" class="page"><div id="paymentsModule"></div></section>
+    <section id="page-receipts" class="page"><div id="receiptsModule"></div></section>
+    <section id="page-users" class="page"><div id="usersModule"></div></section>
+    <section id="page-income" class="page"><div id="incomeModule"></div></section>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="modalTitle">Record</h2><button type="button" onclick="closeModal()" aria-label="Close">×</button></div>
+    <form id="recordForm"><div id="modalFields" class="form-grid"></div><div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button id="saveButton" class="btn primary">Save</button></div></form>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
