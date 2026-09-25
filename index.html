@@ -2,92 +2,2276 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f766e">
-<title>Seeman Foods Management System</title>
-<link rel="stylesheet" href="style.css">
-<script>
-const CONFIG = {
-  WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwPRr22tq9M2RInr7cWmAewMI9e_nOVtfHLZ4FZ3jZroBpxcI-RZhTiMgoQgb44NniAoQ/exec"
-};
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeman Foods - Business Management</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+  :root{--primary:#2563eb;--primary-dark:#1d4ed8;--dark:#111827;--text:#172033;--muted:#64748b;--panel:#ffffff;--panel-soft:#f8fafc;--border:#e2e8f0;--success:#16a34a;--danger:#dc2626;--warning:#d97706;--info:#0284c7}
+  html{scroll-behavior:smooth}body{background:#f3f6fa;color:var(--text);min-height:100vh}
+  button,input,select,textarea{font:inherit}
+  #loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eef4ff,#f8fafc)}
+  .login-box{background:#fff;border:1px solid var(--border);padding:38px;border-radius:20px;box-shadow:0 20px 60px rgba(15,23,42,.12);width:420px;max-width:100%}
+  .login-box h1{color:#1d4ed8;margin-bottom:6px;font-size:30px}.login-box p{color:var(--muted);margin-bottom:24px;font-size:14px}
+  .form-group{margin-bottom:16px}.form-group label{display:block;margin-bottom:7px;font-size:13px;font-weight:600;color:#334155}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 13px;border:1px solid #d7dee8;background:#fff;color:#172033;border-radius:10px;font-size:14px;transition:.2s}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  .btn{padding:10px 16px;border:1px solid transparent;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;transition:transform .15s,box-shadow .15s}
+  .btn:hover{transform:translateY(-1px)}.btn-primary{background:#2563eb;color:#fff;box-shadow:0 6px 15px rgba(37,99,235,.18)}
+  .btn-danger{background:#dc2626;color:#fff}.btn-success{background:#16a34a;color:#fff}.btn-info{background:#0284c7;color:#fff}.btn-warning{background:#d97706;color:#fff}.btn-sm{padding:7px 10px;font-size:12px}.btn-block{width:100%}
+  .error-msg{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px;border-radius:9px;font-size:13px;margin-bottom:12px;display:none}
+  #appPage{display:none;min-height:100vh}.app-container{display:flex;min-height:100vh}
+  .sidebar{width:250px;background:#fff;border-right:1px solid var(--border);color:#172033;display:flex;flex-direction:column;position:fixed;height:100vh;overflow-y:auto;z-index:100;box-shadow:4px 0 18px rgba(15,23,42,.04)}
+  .sidebar-header{padding:22px 20px;border-bottom:1px solid var(--border)}.sidebar-header h2{font-size:19px;color:#1d4ed8}.sidebar-header small{color:#94a3b8;font-size:11px}
+  .sidebar-nav{padding:14px 10px;flex:1}.nav-item{padding:12px 14px;margin:4px 0;cursor:pointer;font-size:14px;color:#64748b;transition:.2s;border:1px solid transparent;border-radius:10px}
+  .nav-item:hover{background:#f1f5f9;color:#1e3a8a;border-color:#e2e8f0}.nav-item.active{background:#eff6ff;color:#2563eb;border-color:#bfdbfe;font-weight:700}
+  .sidebar-footer{padding:16px;border-top:1px solid var(--border);font-size:12px}.sidebar-footer .user-info{color:#64748b;margin-bottom:10px}
+  .main-content{flex:1;margin-left:250px;padding:28px;min-height:100vh;max-width:1700px}
+  .page-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:15px;border-bottom:1px solid var(--border)}
+  .page-header h1{font-size:26px;color:#172033}.page-header .role-badge{background:#eff6ff;color:#1d4ed8;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700}
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:24px}
+  .stat-card,.card{background:#fff;border:1px solid var(--border);box-shadow:0 8px 24px rgba(15,23,42,.05)}
+  .stat-card{padding:20px;border-radius:15px;border-left:4px solid var(--primary)}.stat-card h3{font-size:11px;color:#64748b;text-transform:uppercase;margin-bottom:8px}.stat-card .value{font-size:25px;font-weight:800;color:#172033}
+  .stat-card.green{border-left-color:var(--success)}.stat-card.red{border-left-color:var(--danger)}.stat-card.blue{border-left-color:var(--info)}
+  .card{border-radius:15px;padding:20px;margin-bottom:20px}.card-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}.card-header h2{font-size:18px;color:#172033}
+  .card-header select,.card-header input{background:#fff;color:#172033;border:1px solid var(--border);border-radius:9px;padding:9px}
+  .table-wrap{width:100%;overflow-x:auto;border-radius:10px}table{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}th,td{padding:11px 12px;text-align:left;border-bottom:1px solid #e8edf3}th{background:#f8fafc;color:#64748b;font-weight:700;font-size:11px;text-transform:uppercase}td{color:#334155}tr:hover{background:#f8fbff}.empty-state{text-align:center;padding:45px;color:#94a3b8}
+  .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.48);display:none;align-items:center;justify-content:center;z-index:1000;overflow-y:auto;padding:18px;backdrop-filter:blur(3px)}.modal-overlay.active{display:flex}
+  .modal{background:#fff;border:1px solid var(--border);border-radius:18px;padding:24px;width:620px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 70px rgba(15,23,42,.2)}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:13px;border-bottom:1px solid var(--border)}.modal-header h2{font-size:19px}.modal-close{background:none;border:0;font-size:26px;cursor:pointer;color:#64748b}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.modal-footer{display:flex;justify-content:flex-end;gap:9px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+  .badge{padding:4px 9px;border-radius:12px;font-size:11px;font-weight:700}.badge-paid,.badge-successful,.badge-delivered,.badge-active{background:#dcfce7;color:#166534}.badge-pending,.badge-processing{background:#fef3c7;color:#92400e}.badge-partial,.badge-shipped,.badge-unpaid{background:#dbeafe;color:#1e40af}.badge-failed,.badge-cancelled,.badge-inactive{background:#fee2e2;color:#991b1b}
+  .hidden{display:none!important}.text-right{text-align:right}.mt-2{margin-top:8px}.actions-cell{display:flex;gap:5px;flex-wrap:wrap}
+  #toastContainer{position:fixed;right:22px;bottom:22px;z-index:3000;display:flex;flex-direction:column;gap:10px;pointer-events:none}.toast{min-width:280px;max-width:420px;padding:13px 16px;border:1px solid #dbe4ef;border-radius:12px;background:#fff;color:#172033;box-shadow:0 14px 35px rgba(15,23,42,.15);display:flex;align-items:center;gap:10px;animation:toastIn .25s ease}.toast.success{border-color:#86efac}.toast.error{border-color:#fca5a5}.toast.warning{border-color:#fcd34d}.toast-dot{width:9px;height:9px;border-radius:50%;background:#38bdf8;flex:0 0 auto}.toast.success .toast-dot{background:#22c55e}.toast.error .toast-dot{background:#ef4444}.toast.warning .toast-dot{background:#f59e0b}
+  @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  /* Navigation visibility fix */
+  #appPage .sidebar{visibility:visible!important;opacity:1!important}
+  #appPage .sidebar-nav{visibility:visible!important;opacity:1!important}
+  #appPage .nav-item{visibility:visible!important;opacity:1!important}
+
+  /* ===== MOBILE-FIRST RESPONSIVE UI ===== */
+  @media(max-width:1100px) and (min-width:701px){
+    .sidebar{width:82px}
+    .sidebar-header h2,.sidebar-header small,.sidebar-footer{display:none}
+    .sidebar-nav{padding:14px 8px}
+    .nav-item{display:flex;align-items:center;justify-content:center;text-align:center;padding:14px 5px;font-size:14px}
+    .nav-item .nav-icon{font-size:21px;display:block}
+    .nav-item .nav-label{display:none}
+    .main-content{margin-left:82px;padding:22px}
+    .cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+
+  @media(max-width:700px){
+    html,body{width:100%;overflow-x:hidden}
+    #loginPage{min-height:100dvh;padding:16px}
+    .login-box{width:100%;padding:24px 18px;border-radius:16px}
+    .login-box h1{font-size:25px}
+    .form-group{margin-bottom:14px}
+    .form-group input,.form-group select,.form-group textarea{min-height:46px;font-size:16px}
+    .btn{min-height:44px}
+
+    .app-container{display:block;min-height:100dvh}
+    .main-content{
+      margin-left:0;
+      width:100%;
+      min-height:calc(100dvh - 68px);
+      padding:14px 12px 88px;
+      max-width:none;
+    }
+
+    /* Mobile bottom navigation */
+    .sidebar{
+      position:fixed;
+      left:0;right:0;bottom:0;top:auto;
+      width:100%;
+      height:68px;
+      display:block;
+      border:0;
+      border-top:1px solid #dbe3ed;
+      border-radius:0;
+      background:rgba(255,255,255,.97);
+      box-shadow:0 -8px 24px rgba(15,23,42,.10);
+      z-index:2000;
+      backdrop-filter:blur(10px);
+    }
+    .sidebar-header,.sidebar-footer{display:none}
+    .sidebar-nav{
+      width:100%;
+      height:100%;
+      padding:5px 4px;
+      display:flex;
+      align-items:stretch;
+      gap:2px;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .sidebar-nav::-webkit-scrollbar{display:none}
+    .nav-item{
+      flex:1 0 66px;
+      min-width:66px;
+      margin:0;
+      padding:6px 3px 5px;
+      border:0!important;
+      border-radius:9px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#64748b;
+      font-size:20px;
+      line-height:1;
+    }
+    .nav-item span{
+      display:flex!important;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      max-width:72px;
+      overflow:hidden;
+      white-space:nowrap;
+    }
+    .nav-item .nav-icon{font-size:20px;line-height:20px;display:block}
+    .nav-item .nav-label{display:block;font-size:9px;line-height:12px;font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis}
+    .nav-item.active .nav-label{color:#2563eb}
+    .nav-item.active{background:#eff6ff;color:#2563eb}
+    .nav-item:hover{background:#f8fafc}
+
+    .page-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      margin:0 -12px 14px;
+      padding:12px 12px 11px;
+      background:rgba(243,246,250,.96);
+      border-bottom:1px solid #e2e8f0;
+      backdrop-filter:blur(8px);
+    }
+    .page-header h1{font-size:20px;line-height:1.2}
+    .page-header .role-badge{font-size:10px;padding:4px 9px}
+
+    .cards-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:9px;
+      margin-bottom:14px
+    }
+    .stat-card{
+      min-width:0;
+      padding:13px 12px;
+      border-radius:12px;
+    }
+    .stat-card h3{
+      font-size:9px;
+      line-height:1.25;
+      margin-bottom:6px
+    }
+    .stat-card .value{
+      font-size:17px;
+      line-height:1.25;
+      word-break:break-word
+    }
+
+    .card{
+      padding:13px;
+      border-radius:13px;
+      margin-bottom:13px;
+      overflow:hidden
+    }
+    .card-header{
+      align-items:flex-start;
+      margin-bottom:12px;
+    }
+    .card-header h2{font-size:16px}
+    .card-header select,.card-header input{
+      width:auto;
+      max-width:48%;
+      min-height:40px;
+      font-size:14px
+    }
+
+    /* Tables become card-like rows instead of forcing desktop width */
+    .table-wrap{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      margin:0 -2px
+    }
+    table{
+      min-width:650px;
+      font-size:12px
+    }
+    th,td{padding:9px 8px;white-space:nowrap}
+
+    .actions-cell{gap:4px}
+    .actions-cell .btn{min-height:36px;padding:6px 8px;font-size:11px}
+
+    .form-row{grid-template-columns:1fr;gap:0}
+    .modal-overlay{
+      align-items:flex-end;
+      padding:0;
+    }
+    .modal{
+      width:100%;
+      max-width:100%;
+      max-height:92dvh;
+      padding:18px 15px 16px;
+      border-radius:20px 20px 0 0;
+      border-bottom:0;
+      animation:modalUp .2s ease
+    }
+    .modal-header h2{font-size:18px}
+    .modal-footer{
+      flex-direction:column-reverse;
+      gap:8px;
+      padding-bottom:max(4px,env(safe-area-inset-bottom))
+    }
+    .modal-footer .btn{width:100%;min-height:46px}
+
+    #toastContainer{
+      left:10px;
+      right:10px;
+      bottom:78px;
+      gap:7px;
+    }
+    .toast{
+      width:100%;
+      min-width:0;
+      max-width:none;
+      padding:12px 13px;
+      font-size:13px;
+      border-radius:11px
+    }
+
+    canvas{max-width:100%!important}
+  }
+
+  @media(max-width:390px){
+    .main-content{padding-left:9px;padding-right:9px}
+    .page-header{margin-left:-9px;margin-right:-9px;padding-left:9px;padding-right:9px}
+    .cards-grid{gap:7px}
+    .stat-card{padding:11px 9px}
+    .stat-card .value{font-size:15px}
+    .nav-item{min-width:58px}
+  }
+
+  @media(min-width:701px) and (max-width:1100px){
+    .main-content{margin-left:82px}
+  }
+
+  @keyframes modalUp{
+    from{transform:translateY(40px);opacity:.7}
+    to{transform:translateY(0);opacity:1}
+  }
+</style>
 </head>
 <body>
+<div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
-<div id="loginPage" class="login-page">
-  <div class="login-card">
-    <div class="logo">SF</div>
+<!-- ============ LOGIN PAGE ============ -->
+<div id="loginPage">
+  <div class="login-box">
     <h1>Seeman Foods</h1>
     <p>Business Management System</p>
-    <form id="loginForm">
+    <div id="loginError" class="error-msg"></div>
+    <div class="form-group">
       <label>Username</label>
-      <input id="loginUsername" required autocomplete="username">
+      <input type="text" id="loginUsername" placeholder="Enter username" value="admin">
+    </div>
+    <div class="form-group">
       <label>Password</label>
-      <div class="pw-wrap"><input id="loginPassword" type="password" required autocomplete="current-password"><button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">Show</button></div>
-      <button id="loginButton" class="btn primary full" type="submit">Log in</button>
-    </form>
-    <div id="loginMessage"></div><div id="connectionStatus" class="connection-status"></div>
+      <input type="password" id="loginPassword" placeholder="Enter password" value="admin123">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="handleLogin()">Login</button>
+    <div id="googleStatus" style="margin-top:12px;text-align:center;font-size:12px;color:#6b7280">Connecting to Google Sheets...</div>
+    
   </div>
 </div>
 
-<div id="appPage" class="hidden">
-  <div id="backdrop" class="backdrop"></div>
-  <aside id="sidebar" class="sidebar">
-    <div class="brand"><div class="logo small">SF</div><div><b>Seeman Foods</b><small>Management System</small></div></div>
-    <nav>
-      <button class="nav active" data-page="dashboard">📊 Dashboard</button>
-      <button class="nav" data-page="sales">💰 Sales</button>
-      <button class="nav" data-page="costs">💸 Costs</button>
-      <button class="nav" data-page="customers">👥 Customers</button>
-      <button class="nav" data-page="orders">📦 Orders</button>
-      <button class="nav" data-page="payments">💳 Payments</button>
-      <button class="nav" data-page="receipts">🧾 Pay Receipts</button>
-      <button class="nav admin-only" data-page="users">👤 User Management</button>
-      <button class="nav admin-only" data-page="income">📈 Monthly Income</button>
-    </nav>
-    <button id="logoutButton" class="logout">🚪 Logout</button>
-  </aside>
-
-  <main class="main">
-    <header class="topbar">
-      <div><button id="mobileMenu" class="hamburger" aria-label="Open menu">☰</button><span id="pageTitle">Dashboard</span></div>
-      <div><span id="currentUserName"></span><span id="currentUserRole" class="badge"></span></div>
-    </header>
-
-    <section id="page-dashboard" class="page active">
-      <div class="heading"><div><h1>Dashboard</h1><p>Seeman Foods business overview</p></div><button class="btn primary" onclick="loadDashboard()">Refresh</button></div>
-      <div class="cards">
-        <div class="card"><span>💰</span><small>Monthly Sales</small><strong id="dSales">Rs. 0.00</strong></div>
-        <div class="card"><span>💸</span><small>Monthly Costs</small><strong id="dCosts">Rs. 0.00</strong></div>
-        <div class="card"><span>📈</span><small>Net Profit</small><strong id="dProfit">Rs. 0.00</strong></div>
-        <div class="card"><span>💳</span><small>Pending Payments</small><strong id="dPayments">0</strong></div>
-        <div class="card"><span>📦</span><small>Active Orders</small><strong id="dOrders">0</strong></div>
+<!-- ============ MAIN APP ============ -->
+<div id="appPage">
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Seeman Foods</h2>
+        <small>Management System</small>
       </div>
-      <div class="two-col">
-        <div class="panel"><div class="panel-head"><h2>Recent Sales</h2><button class="btn small" onclick="openPage('sales')">View</button></div><div id="recentSales"></div></div>
-        <div class="panel"><div class="panel-head"><h2>Recent Costs</h2><button class="btn small" onclick="openPage('costs')">View</button></div><div id="recentCosts"></div></div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+      <div class="sidebar-footer">
+        <div class="user-info" id="currentUserInfo"></div>
+        <button class="btn btn-danger btn-sm btn-block" onclick="handleLogout()">Logout</button>
       </div>
-    </section>
-
-    <section id="page-sales" class="page"><div id="salesModule"></div></section>
-    <section id="page-costs" class="page"><div id="costsModule"></div></section>
-    <section id="page-customers" class="page"><div id="customersModule"></div></section>
-    <section id="page-orders" class="page"><div id="ordersModule"></div></section>
-    <section id="page-payments" class="page"><div id="paymentsModule"></div></section>
-    <section id="page-receipts" class="page"><div id="receiptsModule"></div></section>
-    <section id="page-users" class="page"><div id="usersModule"></div></section>
-    <section id="page-income" class="page"><div id="incomeModule"></div></section>
-  </main>
-</div>
-
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="modal-box">
-    <div class="modal-head"><h2 id="modalTitle">Record</h2><button type="button" onclick="closeModal()" aria-label="Close">×</button></div>
-    <form id="recordForm"><div id="modalFields" class="form-grid"></div><div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button id="saveButton" class="btn primary">Save</button></div></form>
+    </aside>
+    <main class="main-content" id="mainContent"></main>
   </div>
 </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script src="app.js"></script>
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+/* ===== UI FEEDBACK ===== */
+function showToast(message,type='success',duration=2800){
+  const box=document.getElementById('toastContainer'); if(!box)return;
+  const t=document.createElement('div'); t.className='toast '+type;
+  const dot=document.createElement('span'); dot.className='toast-dot';
+  const msg=document.createElement('span'); msg.textContent=message;
+  t.append(dot,msg); box.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';setTimeout(()=>t.remove(),220)},duration);
+}
+function actionSuccess(message){showToast(message,'success')}
+function actionError(message){showToast(message,'error',3600)}
+
+/* =====================================================
+   SEEMAN FOODS - BUSINESS MANAGEMENT SYSTEM
+   Single-file HTML App with localStorage persistence
+===================================================== */
+
+
+// =====================================================
+// GOOGLE SHEETS CONNECTION
+// =====================================================
+// Paste your deployed Apps Script Web App /exec URL here.
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxSNqu0-MyTKgoe-St7LLyo3vb2jYUiTeYeesy2H-heq4ftRxlAn4L2h9cuDgvMfU/exec';
+let googleReady = false;
+
+async function apiPost(action, data = {}) {
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('PASTE_YOUR')) {
+    throw new Error('Google Apps Script URL is not configured.');
+  }
+  const payload = JSON.stringify({ action, ...data });
+  let lastError = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payload,
+        cache: 'no-store'
+      });
+      return true;
+    } catch (e) {
+      lastError = e;
+      await new Promise(r => setTimeout(r, 500 * attempt));
+    }
+  }
+  throw lastError || new Error('Google Sheets request failed.');
+}
+
+async function saveToGoogle(action, record) {
+  try {
+    await apiPost(action, record);
+    googleReady = true;
+    const st = document.getElementById('googleStatus');
+    if (st) { st.textContent = '✓ Google Sheets connected'; st.style.color = '#059669'; }
+    return true;
+  } catch (e) {
+    googleReady = false;
+    console.error('Google save failed:', action, e);
+    alert('Local save completed, but Google Sheet save failed.\n\nCheck the Apps Script deployment URL and SPREADSHEET_ID.');
+    return false;
+  }
+}
+
+function apiGet(action) {
+  return new Promise((resolve, reject) => {
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('PASTE_YOUR')) {
+      reject(new Error('Please set GOOGLE_SCRIPT_URL first.'));
+      return;
+    }
+    const callback = 'gs_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('Google Sheets request timed out.'));
+    }, 15000);
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[callback];
+      script.remove();
+    }
+    window[callback] = (result) => {
+      cleanup();
+      if (result && result.success) resolve(result.data);
+      else reject(new Error(result?.message || 'Google Sheets request failed.'));
+    };
+    script.src = GOOGLE_SCRIPT_URL + '?action=' + encodeURIComponent(action) + '&callback=' + callback + '&_=' + Date.now();
+    script.onerror = () => { cleanup(); reject(new Error('Cannot connect to Google Apps Script.')); };
+    document.head.appendChild(script);
+  });
+}
+
+async function loadFromGoogleSheets(showError = false) {
+  try {
+    const data = await apiGet('getData');
+    Object.keys(data || {}).forEach(key => DB.setLocal(key, data[key] || []));
+    googleReady = true;
+    return true;
+  } catch (e) {
+    googleReady = false;
+    const st = document.getElementById('googleStatus');
+    if (st) { st.textContent = '⚠ Google Sheets connection unavailable'; st.style.color = '#dc2626'; }
+    if (showError) alert('Google Sheet connection failed:\n' + e.message);
+    console.error(e);
+    return false;
+  }
+}
+
+async function syncTableToGoogle(table) {
+  if (!googleReady) return;
+  try {
+    await apiPost('replaceData', { table, rows: DB.get(table) });
+  } catch (e) {
+    console.error('Sync failed for ' + table, e);
+  }
+}
+
+// ============ DATA STORE ============
+const DB = {
+  get(key) { return JSON.parse(localStorage.getItem('seeman_' + key) || '[]'); },
+  setLocal(key, val) { localStorage.setItem('seeman_' + key, JSON.stringify(val)); },
+  set(key, val) { localStorage.setItem('seeman_' + key, JSON.stringify(val)); },
+  nextId(key, prefix) {
+    const items = this.get(key);
+    const year = new Date().getFullYear();
+    const padded = String(items.length + 1).padStart(6, '0');
+    return `${prefix}-${year}-${padded}`;
+  }
+};
+
+// Seed initial data
+function seedData() {
+  if (!localStorage.getItem('seeman_users')) {
+    DB.set('users', [
+      { user_id: 1, full_name: 'System Admin', username: 'admin', password: 'admin123', role: 'Admin', email: 'admin@seemanfoods.lk', contact: '0771234567', status: 'Active' },
+      { user_id: 2, full_name: 'Kamal Perera', username: 'staff', password: 'staff123', role: 'Staff', email: 'kamal@seemanfoods.lk', contact: '0779876543', status: 'Active' }
+    ]);
+  }
+  if (!localStorage.getItem('seeman_customers')) {
+    DB.set('customers', [
+      { customer_id: 1, customer_code: 'CUS-2026-000001', customer_name: 'Nimal Silva', contact_number: '0712345678', email: 'nimal@mail.com', address: 'Colombo 05', registered_date: '2026-01-15' },
+      { customer_id: 2, customer_code: 'CUS-2026-000002', customer_name: 'Sunil Fernando', contact_number: '0756789012', email: 'sunil@mail.com', address: 'Kandy', registered_date: '2026-02-20' }
+    ]);
+  }
+  if (!localStorage.getItem('seeman_products')) {
+    DB.set('products', [
+      { product_id: 1, product_code: 'SB - 001', product_name: 'SB - 001', unit_price: 0 },
+      { product_id: 2, product_code: 'SB - 002', product_name: 'SB - 002', unit_price: 0 },
+      { product_id: 3, product_code: 'SB - 003', product_name: 'SB - 003', unit_price: 0 }
+    ]);
+  }
+  ['sales','costs','orders','payments','receipts','reports'].forEach(k => {
+    if (!localStorage.getItem('seeman_' + k)) DB.set(k, []);
+  });
+}
+
+seedData();
+
+// Try to load Google Sheet data immediately. Local demo data remains as fallback.
+loadFromGoogleSheets(false);
+
+// ============ AUTH ============
+let currentUser = null;
+
+async function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+
+  await loadFromGoogleSheets(false);
+  const user = DB.get('users').find(u => u.username === username && u.password === password);
+  if (!user) { errBox.textContent = 'Invalid credentials. Please try again.'; errBox.style.display = 'block'; return; }
+  if (user.status === 'Inactive') { errBox.textContent = 'Account is inactive. Contact admin.'; errBox.style.display = 'block'; return; }
+
+  currentUser = user;
+  errBox.style.display = 'none';
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appPage').style.display = 'block';
+  renderSidebar();
+  navigate(user.role === 'Admin' ? 'dashboard' : 'sales');
+}
+
+function handleLogout() {
+  currentUser = null;
+  document.getElementById('appPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginPassword').value = '';
+}
+
+// ============ PERMISSIONS ============
+const PERMS = {
+  Dashboard: { Admin: ['R'], Staff: [] },
+  Sales:     { Admin: ['C','R','U','D'], Staff: ['C','R'] },
+  Costs:     { Admin: ['C','R','U','D'], Staff: ['C','R'] },
+  Customers: { Admin: ['C','R','U','D'], Staff: ['C','R','U'] },
+  Orders:    { Admin: ['C','R','U','D'], Staff: ['C','R','U'] },
+  Users:     { Admin: ['C','R','U','D'], Staff: [] },
+  Payments:  { Admin: ['C','R','U','D'], Staff: ['C','R'] },
+  Receipts:  { Admin: ['C','R','U','D'], Staff: ['C','R'] },
+  Reports:   { Admin: ['C','R','U','D'], Staff: [] }
+};
+
+function can(action, module) {
+  const p = PERMS[module]?.[currentUser?.role];
+  return Array.isArray(p) && p.includes(action);
+}
+
+// ============ NAVIGATION ============
+const NAV_ITEMS = [
+  { key: 'dashboard', label: '📊 Dashboard',       roles: ['Admin'] },
+  { key: 'sales',     label: '💰 Sales',           roles: ['Admin','Staff'] },
+  { key: 'costs',     label: '📉 Costs',           roles: ['Admin','Staff'] },
+  { key: 'customers', label: '👥 Customers',       roles: ['Admin','Staff'] },
+  { key: 'orders',    label: '📦 Orders',          roles: ['Admin','Staff'] },
+  { key: 'users',     label: '🔐 Users',           roles: ['Admin'] },
+  { key: 'payments',  label: '💳 Payments',        roles: ['Admin','Staff'] },
+  { key: 'receipts',  label: '🧾 Receipts',        roles: ['Admin','Staff'] },
+  { key: 'reports',   label: '📈 Monthly Income',  roles: ['Admin'] }
+];
+
+function renderSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  nav.innerHTML = '';
+  NAV_ITEMS.filter(i => i.roles.includes(currentUser.role)).forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'nav-item';
+    div.dataset.key = item.key;
+    const parts = String(item.label).trim().split(/\s+/);
+    const icon = parts.shift() || '•';
+    const label = parts.join(' ');
+    div.innerHTML = `<span><span class="nav-icon">${icon}</span><span class="nav-label">${label}</span></span>`;
+    div.title = label;
+    div.onclick = () => navigate(item.key);
+    nav.appendChild(div);
+  });
+  document.getElementById('currentUserInfo').innerHTML =
+    `<b>${currentUser.full_name}</b><br>${currentUser.role}`;
+}
+
+function navigate(key) {
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.key === key);
+  });
+  const renderers = {
+    dashboard: renderDashboard, sales: renderSales, costs: renderCosts,
+    customers: renderCustomers, orders: renderOrders, users: renderUsers,
+    payments: renderPayments, receipts: renderReceipts, reports: renderReports
+  };
+  renderers[key]?.();
+}
+
+function pageHeader(title) {
+  return `<div class="page-header">
+    <h1>${title}</h1>
+    <span class="role-badge">${currentUser.role}</span>
+  </div>`;
+}
+
+// ============ DASHBOARD (ADMIN ONLY) ============
+function renderDashboard() {
+  if (currentUser?.role !== 'Admin') {
+    document.getElementById('mainContent').innerHTML = pageHeader('Access Denied - Admin Only');
+    return;
+  }
+
+  const sales = DB.get('sales');
+  const costs = DB.get('costs');
+  const orders = DB.get('orders');
+  const pendingPayments = sales.filter(s => s.payment_status !== 'Paid').length;
+  const pendingOrders = orders.filter(o => o.order_status === 'Pending').length;
+  const totalSales = sales.reduce((s, x) => s + (Number(x.total_amount) || 0), 0);
+  const totalCosts = costs.reduce((s, x) => s + (Number(x.total_price) || 0), 0);
+
+  const now = new Date();
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Dashboard')}
+    <div class="cards-grid">
+      <div class="stat-card"><h3>Total Sales Income</h3><div class="value">Rs. ${totalSales.toLocaleString()}</div></div>
+      <div class="stat-card red"><h3>Total Costs</h3><div class="value">Rs. ${totalCosts.toLocaleString()}</div></div>
+      <div class="stat-card blue"><h3>Pending Payments</h3><div class="value">${pendingPayments}</div></div>
+      <div class="stat-card green"><h3>Pending Orders</h3><div class="value">${pendingOrders}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Monthly Sales Income vs Cost</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="dashboardMonth" onchange="renderDashboardChart()">
+            ${Array.from({length:12},(_,i)=>i+1).map(m => `<option value="${m}" ${m===now.getMonth()+1?'selected':''}>${new Date(2000,m-1).toLocaleString('en',{month:'long'})}</option>`).join('')}
+          </select>
+          <input id="dashboardYear" type="number" value="${now.getFullYear()}" style="width:100px" onchange="renderDashboardChart()">
+        </div>
+      </div>
+      <div style="height:360px"><canvas id="dashboardMonthlyChart"></canvas></div>
+      <small style="color:#6b7280">X-axis = Date | Y-axis = Total Amount (Rs.)</small>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h2>Recent Transactions</h2></div>
+      ${sales.length === 0 ? '<div class="empty-state">No transactions yet</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          ${sales.slice(-5).reverse().map(s => {
+            const c = DB.get('customers').find(x => x.customer_id == s.customer_id);
+            return `<tr>
+              <td>${s.sales_code}</td><td>${s.sale_date}</td>
+              <td>${c?.customer_name || '-'}</td>
+              <td>Rs. ${(Number(s.total_amount)||0).toLocaleString()}</td>
+              <td><span class="badge badge-${(s.payment_status||'pending').toLowerCase()}">${s.payment_status}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+  setTimeout(renderDashboardChart, 0);
+}
+
+function monthlySeries(month, year) {
+  const sales = DB.get('sales').filter(s => {
+    const d = new Date(s.sale_date);
+    return d.getMonth() + 1 === month && d.getFullYear() === year;
+  });
+  const costs = DB.get('costs').filter(c => {
+    const d = new Date(c.cost_date);
+    return d.getMonth() + 1 === month && d.getFullYear() === year;
+  });
+
+  const days = new Date(year, month, 0).getDate();
+  const labels = Array.from({length: days}, (_, i) => String(i + 1).padStart(2, '0'));
+  const income = labels.map(day => sales.filter(s => String(new Date(s.sale_date).getDate()).padStart(2,'0') === day)
+    .reduce((n,s) => n + (Number(s.total_amount)||0), 0));
+  const cost = labels.map(day => costs.filter(c => String(new Date(c.cost_date).getDate()).padStart(2,'0') === day)
+    .reduce((n,c) => n + (Number(c.total_price)||0), 0));
+  return {labels, income, cost};
+}
+
+let dashboardChartInstance = null;
+let reportChartInstance = null;
+
+function renderDashboardChart() {
+  if (currentUser?.role !== 'Admin') return;
+  const canvas = document.getElementById('dashboardMonthlyChart');
+  if (!canvas || typeof Chart === 'undefined') return;
+  const month = Number(document.getElementById('dashboardMonth')?.value) || new Date().getMonth()+1;
+  const year = Number(document.getElementById('dashboardYear')?.value) || new Date().getFullYear();
+  const data = monthlySeries(month, year);
+  if (dashboardChartInstance) dashboardChartInstance.destroy();
+  dashboardChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: { labels: data.labels, datasets: [
+      { label: 'Sales Income', data: data.income, borderWidth: 2, tension: 0.25, fill: false },
+      { label: 'Cost', data: data.cost, borderWidth: 2, tension: 0.25, fill: false }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: { x: { title: { display: true, text: 'Date' } }, y: { beginAtZero: true, title: { display: true, text: 'Total Amount (Rs.)' } } }
+    }
+  });
+}
+
+// ============ SALES ============
+function renderSales() {
+  const sales = DB.get('sales');
+  const customers = DB.get('customers');
+
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Sales Management')}
+    <div class="card">
+      <div class="card-header">
+        <h2>Sales Records</h2>
+        ${can('C','Sales') ? '<button class="btn btn-primary" onclick="openSaleModal()">+ New Sale</button>' : ''}
+      </div>
+      ${sales.length === 0 ? '<div class="empty-state">No sales records</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Sales ID</th><th>Date</th><th>Customer</th>
+          <th>Subtotal</th><th>Service</th><th>Commission</th>
+          <th>Total</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${sales.map(s => {
+            const c = customers.find(x => x.customer_id === s.customer_id);
+            return `<tr>
+              <td>${s.sales_code}</td><td>${s.sale_date}</td>
+              <td>${c?.customer_name || '-'}</td>
+              <td>Rs. ${(s.subtotal||0).toLocaleString()}</td>
+              <td>Rs. ${(s.service_charge_amount||0).toLocaleString()}</td>
+              <td>Rs. ${(s.commission_amount||0).toLocaleString()}</td>
+              <td><b>Rs. ${(s.total_amount||0).toLocaleString()}</b></td>
+              <td><span class="badge badge-${(s.payment_status||'pending').toLowerCase()}">${s.payment_status}</span></td>
+              <td class="actions-cell">
+                <button class="btn btn-info btn-sm" onclick="viewSalePDF(${s.sales_id})">PDF</button>
+                ${can('U','Sales') ? `<button class="btn btn-warning btn-sm" onclick="openSaleModal(${s.sales_id})">Edit</button>` : ''}
+                ${can('D','Sales') ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord('sales',${s.sales_id})">Del</button>` : ''}
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+}
+
+function openSaleModal(id) {
+  const editing = id ? DB.get('sales').find(s => s.sales_id === id) : null;
+  const customers = DB.get('customers');
+  const products = DB.get('products').filter(p => ['SB - 001','SB - 002','SB - 003'].includes(p.product_code || p.product_name));
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <h2>${editing ? 'Edit Sale' : 'New Sale'}</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Customer *</label>
+        <select id="saleCustomer">
+          <option value="">-- Select Customer --</option>
+          ${customers.map(c => `<option value="${c.customer_id}" ${editing?.customer_id===c.customer_id?'selected':''}>${c.customer_name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Date *</label>
+        <input type="date" id="saleDate" value="${editing?.sale_date || new Date().toISOString().slice(0,10)}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Product *</label>
+      <select id="saleProduct" onchange="updateSaleCalc()">
+        <option value="">-- Select Product --</option>
+        ${products.map(p => `<option value="${p.product_id}" ${editing?.product_id==p.product_id?'selected':''}>${p.product_name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Quantity *</label>
+        <input type="number" id="saleQty" min="1" value="${editing?.quantity || 1}" oninput="updateSaleCalc()">
+      </div>
+      <div class="form-group">
+        <label>Unit Price *</label>
+        <input type="number" id="saleUnitPrice" min="0" step="0.01" value="${editing?.unit_price || 0}" oninput="updateSaleCalc()">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Service Charge Rate (%)</label>
+        <input type="number" id="saleServiceRate" value="${editing?.service_charge_rate || 5}" step="0.01" oninput="updateSaleCalc()">
+      </div>
+      <div class="form-group">
+        <label>Commission (Rs.)</label>
+        <input type="number" id="saleCommission" value="${editing?.commission_amount || 0}" step="0.01" oninput="updateSaleCalc()">
+      </div>
+    </div>
+    <div class="card" style="background:#fef3c7;margin-top:12px">
+      <div style="display:flex;justify-content:space-between"><span>Subtotal:</span><b id="calcSubtotal">Rs. 0</b></div>
+      <div style="display:flex;justify-content:space-between"><span>Service Charge:</span><b id="calcService">Rs. 0</b></div>
+      <div style="display:flex;justify-content:space-between"><span>Commission:</span><b id="calcCommission">Rs. 0</b></div>
+      <hr style="margin:6px 0">
+      <div style="display:flex;justify-content:space-between;font-size:16px"><span>Total Amount:</span><b id="calcTotal">Rs. 0</b></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="background:#e5e7eb" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSale(${id || 'null'})">Save Sale</button>
+    </div>
+  `;
+  if (editing?.product_id) {
+    document.getElementById('saleProduct').value = editing.product_id;
+  }
+  updateSaleCalc();
+  showModal();
+}
+
+function updateSaleCalc() {
+  const sel = document.getElementById('saleProduct');
+  const opt = sel.options[sel.selectedIndex];
+  const price = parseFloat(document.getElementById('saleUnitPrice')?.value || 0);
+
+  const qty = parseFloat(document.getElementById('saleQty').value) || 0;
+  const rate = parseFloat(document.getElementById('saleServiceRate').value) || 0;
+  const commission = parseFloat(document.getElementById('saleCommission').value) || 0;
+
+  const subtotal = qty * price;
+  const service = subtotal * (rate / 100);
+  // Per requirements doc: Total = Subtotal - (Service + Commission)
+  const total = subtotal - (service + commission);
+
+  document.getElementById('calcSubtotal').textContent = 'Rs. ' + subtotal.toLocaleString();
+  document.getElementById('calcService').textContent = 'Rs. ' + service.toFixed(2);
+  document.getElementById('calcCommission').textContent = 'Rs. ' + commission.toFixed(2);
+  document.getElementById('calcTotal').textContent = 'Rs. ' + total.toFixed(2);
+}
+
+async function saveSale(id) {
+  const customerId = parseInt(document.getElementById('saleCustomer').value);
+  const productId = parseInt(document.getElementById('saleProduct').value);
+  const qty = parseFloat(document.getElementById('saleQty').value);
+  const unitPrice = parseFloat(document.getElementById('saleUnitPrice').value);
+  const rate = parseFloat(document.getElementById('saleServiceRate').value) || 0;
+  const commission = parseFloat(document.getElementById('saleCommission').value) || 0;
+  const date = document.getElementById('saleDate').value;
+  if (!customerId || !productId || !qty || qty <= 0 || !Number.isFinite(unitPrice) || unitPrice < 0) {
+    actionError('Please fill all required fields correctly.'); return;
+  }
+  const sales = DB.get('sales');
+  const subtotal = qty * unitPrice;
+  const service = subtotal * rate / 100;
+  const total = subtotal - service - commission;
+  let record;
+  if (id) {
+    const idx = sales.findIndex(s => s.sales_id === id);
+    if (idx < 0) { alert('Sale not found'); return; }
+    record = { ...sales[idx], customer_id: customerId, product_id: productId, quantity: qty, unit_price: unitPrice, service_charge_rate: rate, commission_amount: commission, subtotal, service_charge_amount: service, total_amount: total, sale_date: date };
+    sales[idx] = record;
+  } else {
+    record = { sales_id: sales.length ? Math.max(...sales.map(s => Number(s.sales_id)||0)) + 1 : 1, sales_code: DB.nextId('sales', 'SAL'), customer_id: customerId, product_id: productId, quantity: qty, unit_price: unitPrice, service_charge_rate: rate, commission_amount: commission, subtotal, service_charge_amount: service, total_amount: total, payment_status: 'Pending', sale_date: date, created_by: currentUser.user_id };
+    sales.push(record);
+  }
+  DB.set('sales', sales);
+  await saveToGoogle(id ? 'updateSale' : 'addSale', { ...record });
+  if (googleReady) await loadFromGoogleSheets(false);
+  closeModal(); renderSales(); actionSuccess(id ? 'Sale updated successfully.' : 'Sale saved successfully.');
+}
+
+function viewSalePDF(id) {
+  const sales = DB.get('sales') || [];
+  const customers = DB.get('customers') || [];
+  const products = DB.get('products') || [];
+  const users = DB.get('users') || [];
+
+  const s = sales.find(x => String(x.sales_id) === String(id));
+  if (!s) {
+    alert('Sale not found.');
+    return;
+  }
+
+  const c = customers.find(x => String(x.customer_id) === String(s.customer_id));
+  if (!c) {
+    alert('Customer information not found for this sale.');
+    return;
+  }
+
+  const p = products.find(x => String(x.product_id) === String(s.product_id));
+  if (!p) {
+    alert('Product information not found for this sale.');
+    return;
+  }
+
+  const u = users.find(x => String(x.user_id) === String(s.created_by));
+  if (s.created_by && !u) {
+    alert('The user who created this sale was not found.');
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // ==============================
+  // TEMPLATE / BRANDING
+  // Same professional style as Monthly Income Report
+  // ==============================
+  const ORANGE = [217, 119, 6];
+  const DARK = [31, 41, 55];
+  const GRAY = [107, 114, 128];
+  const LIGHT = [249, 250, 251];
+  const BORDER = [229, 231, 235];
+  const GREEN = [16, 185, 129];
+  const RED = [239, 68, 68];
+
+  const money = value => Number(value || 0).toLocaleString('en-LK', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  const saleDate = s.sale_date
+    ? new Date(s.sale_date).toLocaleDateString('en-GB')
+    : '-';
+
+  const generatedBy = u?.username || currentUser?.username || 'System';
+  const generatedAt = new Date().toLocaleString('en-LK');
+
+  const subtotal = Number(s.subtotal || 0);
+  const serviceCharge = Number(s.service_charge_amount || 0);
+  const commission = Number(s.commission_amount || 0);
+  const totalAmount = Number(s.total_amount || 0);
+  const quantity = Number(s.quantity || 0);
+  const unitPrice = Number(s.unit_price || 0);
+  const serviceRate = Number(s.service_charge_rate || 0);
+
+  // ==============================
+  // COMPANY HEADER
+  // ==============================
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(...ORANGE);
+  doc.text('Seeman Foods', 105, 18, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...GRAY);
+  doc.text(
+    '195/B Aluboghalanda Pinnawala South, Waga',
+    105,
+    25,
+    { align: 'center' }
+  );
+  doc.text('+94 77 754 9425', 105, 31, { align: 'center' });
+
+  doc.setDrawColor(...BORDER);
+  doc.setLineWidth(0.5);
+  doc.line(20, 36, 190, 36);
+
+  // ==============================
+  // TITLE
+  // ==============================
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(...DARK);
+  doc.text('Sales Details', 105, 48, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(...GRAY);
+  doc.text(String(s.sales_code || 'Sales Record'), 105, 55, { align: 'center' });
+
+  // ==============================
+  // SALE INFORMATION
+  // ==============================
+  doc.setFillColor(...LIGHT);
+  doc.roundedRect(20, 64, 170, 34, 3, 3, 'F');
+
+  let y = 73;
+  const saleInfo = [
+    ['Sales ID', s.sales_code || '-'],
+    ['Sale Date', saleDate],
+    ['Payment Status', s.payment_status || 'Pending']
+  ];
+
+  saleInfo.forEach(([label, value]) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...DARK);
+    doc.text(label + ':', 27, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    doc.text(String(value), 85, y);
+    y += 9;
+  });
+
+  // ==============================
+  // CUSTOMER INFORMATION
+  // ==============================
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...ORANGE);
+  doc.text('CUSTOMER INFORMATION', 20, 114);
+
+  doc.setDrawColor(...BORDER);
+  doc.setLineWidth(0.4);
+  doc.line(20, 118, 190, 118);
+
+  doc.setFontSize(10);
+  doc.setTextColor(...DARK);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Customer Name:', 27, 128);
+  doc.setFont('helvetica', 'normal');
+  doc.text(String(c.customer_name || '-'), 82, 128);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Contact Number:', 27, 137);
+  doc.setFont('helvetica', 'normal');
+  doc.text(String(c.contact_number || '-'), 82, 137);
+
+  // ==============================
+  // PRODUCT / SALES DETAILS
+  // ==============================
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...ORANGE);
+  doc.text('PRODUCT / SALES DETAILS', 20, 156);
+
+  doc.setDrawColor(...BORDER);
+  doc.line(20, 160, 190, 160);
+
+  if (doc.autoTable) {
+    doc.autoTable({
+      startY: 166,
+      head: [['Product', 'Quantity', 'Unit Price', 'Subtotal']],
+      body: [[
+        String(p.product_name || '-'),
+        String(quantity),
+        'Rs. ' + money(unitPrice),
+        'Rs. ' + money(subtotal)
+      ]],
+      theme: 'grid',
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        textColor: DARK
+      },
+      headStyles: {
+        fillColor: ORANGE,
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      columnStyles: {
+        1: { halign: 'center' },
+        2: { halign: 'right' },
+        3: { halign: 'right' }
+      }
+    });
+  }
+
+  // ==============================
+  // PAYMENT / AMOUNT SUMMARY
+  // ==============================
+  const tableBottom = doc.lastAutoTable?.finalY || 190;
+  const summaryTop = Math.min(tableBottom + 12, 220);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...ORANGE);
+  doc.text('PAYMENT SUMMARY', 20, summaryTop);
+
+  doc.setDrawColor(...BORDER);
+  doc.line(20, summaryTop + 4, 190, summaryTop + 4);
+
+  doc.setFillColor(...LIGHT);
+  doc.roundedRect(20, summaryTop + 10, 170, 53, 3, 3, 'F');
+
+  const summaryRows = [
+    ['Subtotal', 'Rs. ' + money(subtotal)],
+    [`Service Charge (${serviceRate.toFixed(2)}%)`, 'Rs. ' + money(serviceCharge)],
+    ['Commission', 'Rs. ' + money(commission)]
+  ];
+
+  y = summaryTop + 21;
+  summaryRows.forEach(([label, value]) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...DARK);
+    doc.text(label, 28, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(value, 182, y, { align: 'right' });
+    y += 10;
+  });
+
+  doc.setDrawColor(...BORDER);
+  doc.line(28, y - 5, 182, y - 5);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(...ORANGE);
+  doc.text('TOTAL AMOUNT', 28, y + 7);
+  doc.text('Rs. ' + money(totalAmount), 182, y + 7, { align: 'right' });
+
+  // ==============================
+  // STATUS
+  // ==============================
+  const status = String(s.payment_status || 'Pending').toUpperCase();
+  const statusColor = status === 'PAID' ? GREEN : (status === 'PARTIAL' ? ORANGE : RED);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(...statusColor);
+  doc.text('PAYMENT STATUS: ' + status, 105, y + 27, { align: 'center' });
+
+  // ==============================
+  // FOOTER
+  // ==============================
+  doc.setDrawColor(...ORANGE);
+  doc.setLineWidth(0.6);
+  doc.line(20, 268, 190, 268);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...DARK);
+  doc.text('Thank you for your business!', 105, 279, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...GRAY);
+  doc.text('This is a computer-generated sales document.', 105, 284, { align: 'center' });
+  doc.text(`Generated by: ${generatedBy} | ${generatedAt}`, 105, 290, { align: 'center' });
+
+  // ==============================
+  // SAVE PDF
+  // ==============================
+  const safeFileName = String(s.sales_code || 'Sales_Details')
+    .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  doc.save(`${safeFileName}_Sales_Details.pdf`);
+}
+
+// ============ COSTS ============
+function renderCosts() {
+  const costs = DB.get('costs');
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Cost Management')}
+    <div class="card">
+      <div class="card-header">
+        <h2>Cost Records</h2>
+        ${can('C','Costs') ? '<button class="btn btn-primary" onclick="openCostModal()">+ New Cost</button>' : ''}
+      </div>
+      ${costs.length === 0 ? '<div class="empty-state">No cost records</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cost ID</th><th>Date</th><th>Name</th><th>Category</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${costs.map(c => `<tr>
+            <td>${c.cost_code}</td><td>${c.cost_date}</td><td>${c.product_name}</td>
+            <td>${c.category}</td><td>${c.quantity}</td>
+            <td>Rs. ${c.unit_price.toLocaleString()}</td>
+            <td><b>Rs. ${c.total_price.toLocaleString()}</b></td>
+            <td><span class="badge badge-${c.payment_status.toLowerCase()}">${c.payment_status}</span></td>
+            <td class="actions-cell">
+              ${can('U','Costs') ? `<button class="btn btn-warning btn-sm" onclick="openCostModal(${c.cost_id})">Edit</button>` : ''}
+              ${can('D','Costs') ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord('costs',${c.cost_id})">Del</button>` : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+}
+
+function openCostModal(id) {
+  const editing = id ? DB.get('costs').find(c => c.cost_id === id) : null;
+  const categories = ['Inventory','Transport','Freselizer','Salary','Fuel','Other'];
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <h2>${editing ? 'Edit Cost' : 'New Cost'}</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date *</label>
+        <input type="date" id="costDate" value="${editing?.cost_date || new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="costCategory">
+          ${categories.map(c => `<option ${editing?.category===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Product / Expense Name *</label>
+      <input type="text" id="costName" value="${editing?.product_name || ''}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Quantity *</label>
+        <input type="number" id="costQty" min="1" value="${editing?.quantity || 1}" oninput="updateCostCalc()">
+      </div>
+      <div class="form-group">
+        <label>Unit Price *</label>
+        <input type="number" id="costUnitPrice" value="${editing?.unit_price || 0}" oninput="updateCostCalc()">
+      </div>
+    </div>
+    <div class="card" style="background:#fee2e2">
+      <div style="display:flex;justify-content:space-between;font-size:16px">
+        <span>Total Price:</span><b id="costTotal">Rs. 0</b>
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <label>Payment Status</label>
+      <select id="costStatus">
+        <option ${editing?.payment_status==='Paid'?'selected':''}>Paid</option>
+        <option ${editing?.payment_status==='Unpaid'?'selected':''}>Unpaid</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="background:#e5e7eb" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCost(${id || 'null'})">Save Cost</button>
+    </div>
+  `;
+  updateCostCalc();
+  showModal();
+}
+
+function updateCostCalc() {
+  const q = parseFloat(document.getElementById('costQty').value) || 0;
+  const p = parseFloat(document.getElementById('costUnitPrice').value) || 0;
+  document.getElementById('costTotal').textContent = 'Rs. ' + (q * p).toLocaleString();
+}
+
+async function saveCost(id) {
+  const name = document.getElementById('costName').value.trim();
+  const qty = parseFloat(document.getElementById('costQty').value);
+  const unitPrice = parseFloat(document.getElementById('costUnitPrice').value);
+  if (!name || !qty || qty <= 0 || !Number.isFinite(unitPrice) || unitPrice < 0) { actionError('Fill all fields correctly.'); return; }
+  const costs = DB.get('costs');
+  const data = { product_name: name, category: document.getElementById('costCategory').value, quantity: qty, unit_price: unitPrice, total_price: qty * unitPrice, cost_date: document.getElementById('costDate').value, payment_status: document.getElementById('costStatus').value };
+  let record;
+  if (id) {
+    const idx = costs.findIndex(c => c.cost_id === id);
+    if (idx < 0) { alert('Cost not found'); return; }
+    record = { ...costs[idx], ...data }; costs[idx] = record;
+  } else {
+    record = { cost_id: costs.length ? Math.max(...costs.map(c => Number(c.cost_id)||0)) + 1 : 1, cost_code: DB.nextId('costs', 'CST'), ...data, created_by: currentUser.user_id }; costs.push(record);
+  }
+  DB.set('costs', costs);
+  await saveToGoogle(id ? 'updateCost' : 'addCost', { ...record });
+  if (googleReady) await loadFromGoogleSheets(false);
+  closeModal(); renderCosts(); actionSuccess(id ? 'Cost updated successfully.' : 'Cost saved successfully.');
+}
+
+// ============ CUSTOMERS ============
+function renderCustomers() {
+  const customers = DB.get('customers');
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Customer Management')}
+    <div class="card">
+      <div class="card-header">
+        <h2>Customers</h2>
+        ${can('C','Customers') ? '<button class="btn btn-primary" onclick="openCustomerModal()">+ New Customer</button>' : ''}
+      </div>
+      ${customers.length === 0 ? '<div class="empty-state">No customers</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Name</th><th>Contact</th><th>Email</th><th>Address</th><th>Registered</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${customers.map(c => `<tr>
+            <td>${c.customer_code}</td><td><b>${c.customer_name}</b></td>
+            <td>${c.contact_number}</td><td>${c.email}</td>
+            <td>${c.address}</td><td>${c.registered_date}</td>
+            <td class="actions-cell">
+              ${can('U','Customers') ? `<button class="btn btn-warning btn-sm" onclick="openCustomerModal(${c.customer_id})">Edit</button>` : ''}
+              ${can('D','Customers') ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord('customers',${c.customer_id})">Del</button>` : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+}
+
+function openCustomerModal(id) {
+  const editing = id ? DB.get('customers').find(c => c.customer_id === id) : null;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <h2>${editing ? 'Edit Customer' : 'New Customer'}</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="form-group"><label>Name *</label>
+      <input type="text" id="custName" value="${editing?.customer_name || ''}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Contact *</label>
+        <input type="text" id="custContact" value="${editing?.contact_number || ''}"></div>
+      <div class="form-group"><label>Email</label>
+        <input type="email" id="custEmail" value="${editing?.email || ''}"></div>
+    </div>
+    <div class="form-group"><label>Address *</label>
+      <textarea id="custAddress" rows="2">${editing?.address || ''}</textarea></div>
+    <div class="modal-footer">
+      <button class="btn" style="background:#e5e7eb" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCustomer(${id || 'null'})">Save</button>
+    </div>
+  `;
+  showModal();
+}
+
+async function saveCustomer(id) {
+  const name = document.getElementById('custName').value.trim();
+  if (!name) { alert('Name required'); return; }
+  const customers = DB.get('customers');
+  const data = { customer_name: name, contact_number: document.getElementById('custContact').value.trim(), email: document.getElementById('custEmail').value.trim(), address: document.getElementById('custAddress').value.trim() };
+  let record;
+  if (id) {
+    const idx = customers.findIndex(c => c.customer_id === id);
+    if (idx < 0) { alert('Customer not found'); return; }
+    record = { ...customers[idx], ...data }; customers[idx] = record;
+  } else {
+    record = { customer_id: customers.length ? Math.max(...customers.map(c => Number(c.customer_id)||0)) + 1 : 1, customer_code: DB.nextId('customers', 'CUS'), ...data, registered_date: new Date().toISOString().slice(0,10) }; customers.push(record);
+  }
+  DB.set('customers', customers);
+  await saveToGoogle(id ? 'updateCustomer' : 'addCustomer', { ...record });
+  if (googleReady) await loadFromGoogleSheets(false);
+  closeModal(); renderCustomers();
+}
+
+// ============ ORDERS ============
+function renderOrders() {
+  const orders = DB.get('orders');
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Order Management')}
+    <div class="card">
+      <div class="card-header">
+        <h2>Orders</h2>
+        ${can('C','Orders') ? '<button class="btn btn-primary" onclick="openOrderModal()">+ New Order</button>' : ''}
+      </div>
+      ${orders.length === 0 ? '<div class="empty-state">No orders</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Quantity</th><th>Status</th><th>Est. Delivery</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${orders.map(o => {
+            const c = DB.get('customers').find(x => x.customer_id === o.customer_id);
+            return `<tr>
+              <td>${o.order_code}</td><td>${o.order_date}</td>
+              <td>${c?.customer_name || '-'}</td>
+              <td><b>${Number(o.quantity||0).toLocaleString()}</b></td>
+              <td><span class="badge badge-${o.order_status.toLowerCase()}">${o.order_status}</span></td>
+              <td>${o.estimated_delivery_date || '-'}</td>
+              <td class="actions-cell">
+                ${can('U','Orders') ? `<button class="btn btn-warning btn-sm" onclick="openOrderModal(${o.order_id})">Edit</button>` : ''}
+                ${can('D','Orders') ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord('orders',${o.order_id})">Del</button>` : ''}
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+}
+
+function openOrderModal(id) {
+  const editing = id ? DB.get('orders').find(o => o.order_id === id) : null;
+  const customers = DB.get('customers');
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <h2>${editing ? 'Edit Order' : 'New Order'}</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Customer *</label>
+        <select id="orderCustomer">
+          <option value="">-- Select --</option>
+          ${customers.map(c => `<option value="${c.customer_id}" ${editing?.customer_id===c.customer_id?'selected':''}>${c.customer_name}</option>`).join('')}
+        </select></div>
+      <div class="form-group"><label>Order Date *</label>
+        <input type="date" id="orderDate" value="${editing?.order_date || new Date().toISOString().slice(0,10)}"></div>
+    </div>
+    <div class="form-group"><label>Quantity *</label>
+      <input type="number" id="orderQuantity" min="1" value="${editing?.quantity || 1}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Status</label>
+        <select id="orderStatus">
+          ${['Pending','Processing','Shipped','Delivered','Cancelled'].map(s => `<option ${editing?.order_status===s?'selected':''}>${s}</option>`).join('')}
+        </select></div>
+      <div class="form-group"><label>Est. Delivery Date</label>
+        <input type="date" id="orderDelivery" value="${editing?.estimated_delivery_date || ''}"></div>
+    </div>
+    <div class="form-group"><label>Delivery Address *</label>
+      <textarea id="orderAddress" rows="2">${editing?.delivery_address || ''}</textarea></div>
+    <div class="modal-footer">
+      <button class="btn" style="background:#e5e7eb" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveOrder(${id || 'null'})">Save</button>
+    </div>
+  `;
+  showModal();
+}
+
+async function saveOrder(id) {
+  const customerId = parseInt(document.getElementById('orderCustomer').value);
+  if (!customerId) { alert('Select a customer'); return; }
+  const orders = DB.get('orders');
+  const data = {
+    customer_id: customerId,
+    order_date: document.getElementById('orderDate').value,
+    quantity: parseFloat(document.getElementById('orderQuantity').value) || 0,
+    order_status: document.getElementById('orderStatus').value,
+    estimated_delivery_date: document.getElementById('orderDelivery').value,
+    delivery_address: document.getElementById('orderAddress').value
+  };
+  if (id) {
+    const idx = orders.findIndex(o => o.order_id === id);
+    orders[idx] = { ...orders[idx], ...data };
+  } else {
+    orders.push({
+      order_id: orders.length ? Math.max(...orders.map(o => o.order_id)) + 1 : 1,
+      order_code: DB.nextId('orders', 'ORD'),
+      ...data, created_by: currentUser.user_id
+    });
+  }
+  DB.set('orders', orders);
+  await saveToGoogle(id ? 'updateOrder' : 'addOrder', { ...orders.find(o => o.order_id === (id || orders[orders.length-1].order_id)) });
+  if (googleReady) await loadFromGoogleSheets(false);
+  closeModal(); renderOrders();
+}
+
+// ============ USERS (Admin only) ============
+function renderUsers() {
+  if (!can('R','Users')) { document.getElementById('mainContent').innerHTML = pageHeader('Access Denied'); return; }
+  const users = DB.get('users');
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('User Management')}
+    <div class="card">
+      <div class="card-header">
+        <h2>System Users</h2>
+        <button class="btn btn-primary" onclick="openUserModal()">+ New User</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>User ID</th><th>Full Name</th><th>Username</th><th>Role</th><th>Contact</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${users.map(u => `<tr>
+            <td>USR-${String(u.user_id).padStart(6,'0')}</td>
+            <td>${u.full_name}</td><td>${u.username}</td>
+            <td><span class="badge badge-${u.role==='Admin'?'successful':'pending'}">${u.role}</span></td>
+            <td>${u.contact || '-'}</td>
+            <td><span class="badge badge-${u.status.toLowerCase()}">${u.status}</span></td>
+            <td class="actions-cell">
+              <button class="btn btn-warning btn-sm" onclick="openUserModal(${u.user_id})">Edit</button>
+              ${u.user_id !== currentUser.user_id ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord('users',${u.user_id})">Del</button>` : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function openUserModal(id) {
+  const editing = id ? DB.get('users').find(u => u.user_id === id) : null;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <h2>${editing ? 'Edit User' : 'New User'}</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="form-group"><label>Full Name *</label>
+      <input type="text" id="userFullName" value="${editing?.full_name || ''}"></div>
+    <div class="form-group"><label>Username *</label>
+      <input type="text" id="userUsername" value="${editing?.username || ''}" ${editing?'readonly':''}></div>
+    <div class="form-group"><label>Password ${editing?'(leave blank to keep)':'*'}</label>
+      <input type="password" id="userPassword" placeholder="${editing?'••••••':'Enter password'}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Role *</label>
+        <select id="userRole">
+          <option ${editing?.role==='Admin'?'selected':''}>Admin</option>
+          <option ${editing?.role==='Staff'?'selected':''}>Staff</option>
+        </select></div>
+      <div class="form-group"><label>Status</label>
+        <select id="userStatus">
+          <option ${editing?.status==='Active'?'selected':''}>Active</option>
+          <option ${editing?.status==='Inactive'?'selected':''}>Inactive</option>
+        </select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Email</label>
+        <input type="email" id="userEmail" value="${editing?.email || ''}"></div>
+      <div class="form-group"><label>Contact</label>
+        <input type="text" id="userContact" value="${editing?.contact || ''}"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="background:#e5e7eb" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveUser(${id || 'null'})">Save</button>
+    </div>
+  `;
+  showModal();
+}
+
+async function saveUser(id) {
+  const fullName = document.getElementById('userFullName').value.trim();
+  const username = document.getElementById('userUsername').value.trim();
+  const password = document.getElementById('userPassword').value;
+  const users = DB.get('users');
+
+  if (!fullName || !username) { alert('Fill required fields'); return; }
+  if (!id && !password) { alert('Password required for new user'); return; }
+
+  if (!id && users.find(u => u.username === username)) {
+    alert('Username already exists'); return;
+  }
+
+  const data = {
+    full_name: fullName, username,
+    role: document.getElementById('userRole').value,
+    status: document.getElementById('userStatus').value,
+    email: document.getElementById('userEmail').value,
+    contact: document.getElementById('userContact').value
+  };
+  if (password) data.password = password;
+
+  if (id) {
+    const idx = users.findIndex(u => u.user_id === id);
+    users[idx] = { ...users[idx], ...data };
+  } else {
+    users.push({
+      user_id: users.length ? Math.max(...users.map(u => u.user_id)) + 1 : 1,
+      ...data
+    });
+  }
+  DB.set('users', users);
+  const action = id ? 'updateUser' : 'addUser';
+  await saveToGoogle(action, users.find(u => u.user_id === (id || users[users.length-1].user_id)));
+  if (googleReady) await loadFromGoogleSheets(false);
+  closeModal(); renderUsers();
+}
+
+// ============ PAYMENTS ============
+function renderPayments() {
+  const payments = DB.get('payments');
+  const customers = DB.get('customers');
+  const sales = DB.get('sales');
+
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Payment Management')}
+    <div class="card">
+      <div class="card-header">
+        <h2>Payments</h2>
+        ${can('C','Payments') ? '<button class="btn btn-primary" onclick="openPaymentModal()">+ New Payment</button>' : ''}
+      </div>
+      ${payments.length === 0 ? '<div class="empty-state">No payments</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Payment ID</th><th>Date</th><th>Customer</th><th>Sales Ref</th><th>Amount</th><th>Method</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${payments.map(p => {
+            const c = customers.find(x => x.customer_id === p.customer_id);
+            const s = sales.find(x => x.sales_id === p.sales_id);
+            return `<tr>
+              <td>${p.payment_code}</td><td>${p.payment_date}</td>
+              <td>${c?.customer_name || '-'}</td>
+              <td>${s?.sales_code || '-'}</td>
+              <td><b>Rs. ${(p.payment_amount||0).toLocaleString()}</b></td>
+              <td>${p.payment_method}</td>
+              <td><span class="badge badge-${p.payment_status.toLowerCase()}">${p.payment_status}</span></td>
+              <td class="actions-cell">
+                <button class="btn btn-success btn-sm" onclick="createReceiptFromPayment(${p.payment_id})">Receipt</button>
+                ${can('D','Payments') ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord('payments',${p.payment_id})">Del</button>` : ''}
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+}
+
+function openPaymentModal() {
+  const customers = DB.get('customers');
+  const sales = DB.get('sales');
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <h2>New Payment</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Customer *</label>
+        <select id="payCustomer" onchange="filterSalesByCustomer()">
+          <option value="">-- Select --</option>
+          ${customers.map(c => `<option value="${c.customer_id}">${c.customer_name}</option>`).join('')}
+        </select></div>
+      <div class="form-group"><label>Sales Ref *</label>
+        <select id="paySales"><option value="">-- Select customer first --</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Payment Date</label>
+        <input type="date" id="payDate" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="form-group"><label>Amount (Rs.) *</label>
+        <input type="number" id="payAmount" value="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Method</label>
+        <select id="payMethod">
+          <option>Cash</option><option>Card</option>
+          <option>Bank Transfer</option><option>Cheque</option>
+        </select></div>
+      <div class="form-group"><label>Reference No.</label>
+        <input type="text" id="payRef"></div>
+    </div>
+    <div class="form-group"><label>Status</label>
+      <select id="payStatus">
+        <option>Successful</option><option>Pending</option><option>Failed</option>
+      </select></div>
+    <div class="modal-footer">
+      <button class="btn" style="background:#e5e7eb" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePayment()">Save Payment</button>
+    </div>
+  `;
+  showModal();
+}
+
+function filterSalesByCustomer() {
+  const cid = parseInt(document.getElementById('payCustomer').value);
+  const sales = DB.get('sales').filter(s => s.customer_id === cid);
+  document.getElementById('paySales').innerHTML = sales.length
+    ? sales.map(s => `<option value="${s.sales_id}">${s.sales_code} - Rs.${s.total_amount} (${s.payment_status})</option>`).join('')
+    : '<option value="">No sales for this customer</option>';
+}
+
+async function savePayment() {
+  const cid = parseInt(document.getElementById('payCustomer').value);
+  const sid = parseInt(document.getElementById('paySales').value);
+  const amount = parseFloat(document.getElementById('payAmount').value);
+  if (!cid || !sid || !amount || amount <= 0) { alert('Fill required fields'); return; }
+  const payments = DB.get('payments');
+  const record = {
+    payment_id: payments.length ? Math.max(...payments.map(p => Number(p.payment_id)||0)) + 1 : 1,
+    payment_code: DB.nextId('payments', 'PAY'), customer_id: cid, sales_id: sid,
+    payment_date: document.getElementById('payDate').value, payment_amount: amount,
+    payment_method: document.getElementById('payMethod').value,
+    transaction_ref: document.getElementById('payRef').value.trim(),
+    payment_status: document.getElementById('payStatus').value, created_by: currentUser.user_id
+  };
+  payments.push(record); DB.set('payments', payments);
+  await saveToGoogle('addPayment', record);
+  if (record.payment_status === 'Successful') {
+    updateSaleStatus(sid);
+    const updatedSale = DB.get('sales').find(s => Number(s.sales_id) === Number(sid));
+    if (updatedSale) await saveToGoogle('updateSale', updatedSale);
+  }
+  if (googleReady) await loadFromGoogleSheets(false);
+  closeModal(); renderPayments();
+  alert('Payment saved successfully.');
+}
+
+function updateSaleStatus(salesId) {
+  const sales = DB.get('sales');
+  const sale = sales.find(s => s.sales_id === salesId);
+  const paid = DB.get('payments')
+    .filter(p => p.sales_id === salesId && p.payment_status === 'Successful')
+    .reduce((sum, p) => sum + p.payment_amount, 0);
+
+  let status = 'Pending';
+  if (paid >= sale.total_amount) status = 'Paid';
+  else if (paid > 0) status = 'Partial';
+
+  const idx = sales.findIndex(s => s.sales_id === salesId);
+  sales[idx].payment_status = status;
+  DB.set('sales', sales);
+}
+
+// ============ RECEIPTS ============
+function renderReceipts() {
+  const receipts = DB.get('receipts');
+  const customers = DB.get('customers');
+  const payments = DB.get('payments');
+
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Pay Receipt Management')}
+    <div class="card">
+      <div class="card-header">
+        <h2>Receipts</h2>
+        ${can('C','Receipts') ? '<button class="btn btn-primary" onclick="openReceiptModal()">+ New Receipt</button>' : ''}
+      </div>
+      ${receipts.length === 0 ? '<div class="empty-state">No receipts</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Receipt ID</th><th>Date</th><th>Payment Ref</th><th>Customer</th><th>Amount Paid</th><th>Balance Due</th><th>Issued By</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${receipts.map(r => {
+            const c = customers.find(x => x.customer_id === r.customer_id);
+            const p = payments.find(x => x.payment_id === r.payment_id);
+            const u = DB.get('users').find(x => x.user_id === r.issued_by);
+            return `<tr>
+              <td>${r.receipt_code}</td>
+              <td>${new Date(r.issued_at).toLocaleDateString()}</td>
+              <td>${p?.payment_code || '-'}</td>
+              <td>${c?.customer_name || '-'}</td>
+              <td><b>Rs. ${(r.amount_paid||0).toLocaleString()}</b></td>
+              <td>Rs. ${(r.balance_due||0).toLocaleString()}</td>
+              <td>${u?.username || '-'}</td>
+              <td class="actions-cell">
+                <button class="btn btn-info btn-sm" onclick="printReceipt(${r.receipt_id})">Print PDF</button>
+                ${can('D','Receipts') ? `<button class="btn btn-danger btn-sm" onclick="deleteRecord('receipts',${r.receipt_id})">Del</button>` : ''}
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+}
+
+async function createReceiptFromPayment(paymentId) {
+  const payments = DB.get('payments');
+  const p = payments.find(x => Number(x.payment_id) === Number(paymentId));
+  if (!p) { alert('Payment not found.'); return; }
+  if (p.payment_status !== 'Successful') { alert('Receipt can only be generated for a successful payment.'); return; }
+  const existing = DB.get('receipts').find(r => Number(r.payment_id) === Number(paymentId));
+  if (existing) { alert(`Receipt already exists: ${existing.receipt_code}`); return; }
+  const sales = DB.get('sales');
+  const sale = sales.find(s => Number(s.sales_id) === Number(p.sales_id));
+  if (!sale) { alert('Related sale not found.'); return; }
+  const paid = payments.filter(x => Number(x.sales_id) === Number(p.sales_id) && x.payment_status === 'Successful').reduce((sum,x)=>sum+Number(x.payment_amount||0),0);
+  const saleTotal = Number(sale.total_amount||0);
+  const balance = Math.max(0, saleTotal-paid);
+  const paymentAmount = Number(p.payment_amount||0);
+  if (paymentAmount <= 0) { alert('Invalid payment amount.'); return; }
+  const receipts = DB.get('receipts');
+  const receipt = {
+    receipt_id: receipts.length ? Math.max(...receipts.map(r=>Number(r.receipt_id)||0))+1 : 1,
+    receipt_code: DB.nextId('receipts','RCP'), payment_id:Number(p.payment_id), sales_id:Number(p.sales_id),
+    customer_id:Number(p.customer_id), amount_paid:paymentAmount, total_sale_amount:saleTotal, total_paid:paid,
+    balance_due:balance, payment_method:p.payment_method||'', payment_date:p.payment_date||new Date().toISOString().slice(0,10),
+    issued_by:currentUser.user_id, issued_at:new Date().toISOString(), status:balance<=0?'Paid':'Partial'
+  };
+  receipts.push(receipt); DB.set('receipts',receipts);
+  const idx=sales.findIndex(s=>Number(s.sales_id)===Number(p.sales_id));
+  if(idx>=0){sales[idx].payment_status=paid>=saleTotal?'Paid':paid>0?'Partial':'Pending';DB.set('sales',sales);}
+  await saveToGoogle('addReceipt', receipt);
+  if (idx >= 0) await saveToGoogle('updateSale', {...sales[idx]});
+  if (googleReady) await loadFromGoogleSheets(false);
+  alert(`Receipt generated successfully!\n\nReceipt: ${receipt.receipt_code}\nAmount Paid: Rs. ${paymentAmount.toLocaleString()}\nBalance Due: Rs. ${balance.toLocaleString()}`);
+  renderPayments();
+}
+
+function openReceiptModal() {
+  const payments = DB.get('payments').filter(p => p.payment_status === 'Successful');
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <h2>Generate Receipt</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="form-group">
+      <label>Select Payment *</label>
+      <select id="receiptPayment">
+        <option value="">-- Select --</option>
+        ${payments.map(p => `<option value="${p.payment_id}">${p.payment_code} - Rs.${p.payment_amount}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="background:#e5e7eb" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveReceipt()">Generate</button>
+    </div>
+  `;
+  showModal();
+}
+
+async function saveReceipt() {
+  const pid = parseInt(document.getElementById('receiptPayment').value);
+  if (!pid) { alert('Select a payment'); return; }
+  await createReceiptFromPayment(pid);
+  closeModal();
+  renderReceipts();
+}
+
+function printReceipt(id) {
+  try {
+    const receipts = DB.get('receipts') || [];
+    const payments = DB.get('payments') || [];
+    const customers = DB.get('customers') || [];
+    const users = DB.get('users') || [];
+
+    const r = receipts.find(x => x.receipt_id === id);
+    if (!r) {
+      alert('Receipt not found.');
+      return;
+    }
+
+    const p = payments.find(x => String(x.payment_id) === String(r.payment_id));
+    if (!p) {
+      alert('Payment information not found for this receipt.');
+      return;
+    }
+
+    const c = customers.find(x => String(x.customer_id) === String(r.customer_id));
+    if (!c) {
+      alert('Customer information not found for this receipt.');
+      return;
+    }
+
+    if (r.issued_by === undefined || r.issued_by === null || String(r.issued_by).trim() === '') {
+      alert('Issued By user information is missing from this receipt.');
+      return;
+    }
+
+    const u = users.find(x => String(x.user_id) === String(r.issued_by));
+    if (!u) {
+      alert('The user who issued this receipt was not found.');
+      return;
+    }
+
+    if (!u.username || !String(u.username).trim()) {
+      alert('Receipt issuer username is missing.');
+      return;
+    }
+
+    if (!r.receipt_code) {
+      alert('Receipt number is missing.');
+      return;
+    }
+
+    const amountPaid = Number(r.amount_paid);
+    const balanceDue = Number(r.balance_due || 0);
+
+    if (!Number.isFinite(amountPaid)) {
+      alert('Invalid amount paid in this receipt.');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    if (!jsPDF) {
+      alert('PDF library is not loaded. Please check your internet connection and reload the page.');
+      return;
+    }
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const ORANGE = [217, 119, 6];
+    const DARK = [31, 41, 55];
+    const GRAY = [107, 114, 128];
+    const LIGHT = [249, 250, 251];
+    const BORDER = [229, 231, 235];
+    const GREEN = [16, 185, 129];
+    const RED = [239, 68, 68];
+
+    const companyName = 'Seeman Foods';
+    const companyAddress = '195/B Aluboghalanda Pinnawala South, Waga';
+    const companyPhone = '+94 77 754 9425';
+
+    const customerName = String(c.customer_name || 'N/A');
+    const username = String(u.username).trim();
+    const paymentMethod = String(p.payment_method || 'N/A');
+    const reference = String(p.transaction_ref || 'N/A');
+    const paymentCode = String(p.payment_code || 'N/A');
+
+    const issuedDate = r.issued_at && !Number.isNaN(new Date(r.issued_at).getTime())
+      ? new Date(r.issued_at).toLocaleString()
+      : new Date().toLocaleString();
+
+    // ==============================
+    // PAGE
+    // ==============================
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, 210, 297, 'F');
+
+    // ==============================
+    // COMPANY HEADER - SAME STYLE AS REPORT TEMPLATE
+    // ==============================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.setTextColor(...ORANGE);
+    doc.text(companyName, 105, 20, { align: 'center' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...GRAY);
+    doc.text(companyAddress, 105, 27, { align: 'center' });
+    doc.text(companyPhone, 105, 33, { align: 'center' });
+
+    doc.setDrawColor(...ORANGE);
+    doc.setLineWidth(0.8);
+    doc.line(20, 40, 190, 40);
+
+    // ==============================
+    // TITLE
+    // ==============================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    doc.setTextColor(...DARK);
+    doc.text('PAYMENT RECEIPT', 105, 51, { align: 'center' });
+
+    // ==============================
+    // RECEIPT INFORMATION
+    // ==============================
+    doc.setFillColor(...LIGHT);
+    doc.roundedRect(20, 59, 170, 35, 3, 3, 'F');
+
+    const receiptRows = [
+      ['Receipt Number', r.receipt_code],
+      ['Payment ID', paymentCode],
+      ['Date & Time', issuedDate]
+    ];
+
+    let y = 68;
+    doc.setFontSize(10);
+
+    receiptRows.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...DARK);
+      doc.text(label + ':', 27, y);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 0, 0);
+      doc.text(String(value), 82, y);
+      y += 9;
+    });
+
+    // ==============================
+    // CUSTOMER INFORMATION
+    // ==============================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...ORANGE);
+    doc.text('CUSTOMER INFORMATION', 20, 108);
+
+    doc.setDrawColor(...BORDER);
+    doc.setLineWidth(0.4);
+    doc.line(20, 112, 190, 112);
+
+    doc.setFontSize(10);
+    doc.setTextColor(...DARK);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Customer Name:', 27, 122);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(customerName, 80, 122);
+
+    // ==============================
+    // PAYMENT DETAILS
+    // ==============================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...ORANGE);
+    doc.text('PAYMENT DETAILS', 20, 140);
+
+    doc.setDrawColor(...BORDER);
+    doc.line(20, 144, 190, 144);
+
+    const paymentRows = [
+      ['Payment Method:', paymentMethod],
+      ['Reference:', reference],
+      ['Issued By:', username]
+    ];
+
+    y = 154;
+    doc.setFontSize(10);
+
+    paymentRows.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...DARK);
+      doc.text(label, 27, y);
+
+      doc.setFont('helvetica', 'normal');
+      doc.text(String(value), 82, y);
+      y += 9;
+    });
+
+    // ==============================
+    // PAYMENT SUMMARY
+    // ==============================
+    doc.setFillColor(...LIGHT);
+    doc.roundedRect(20, 184, 170, 48, 3, 3, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...DARK);
+    doc.text('Amount Paid', 28, 198);
+
+    doc.setFontSize(15);
+    doc.setTextColor(...ORANGE);
+    doc.text(
+      'Rs. ' + amountPaid.toLocaleString('en-LK', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }),
+      182,
+      198,
+      { align: 'right' }
+    );
+
+    doc.setFontSize(11);
+    doc.setTextColor(...DARK);
+    doc.text('Balance Due', 28, 216);
+
+    doc.setFontSize(13);
+    doc.setTextColor(...(balanceDue > 0 ? RED : GREEN));
+    doc.text(
+      'Rs. ' + balanceDue.toLocaleString('en-LK', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }),
+      182,
+      216,
+      { align: 'right' }
+    );
+
+    // ==============================
+    // STATUS
+    // ==============================
+    const status = balanceDue > 0 ? 'PARTIALLY PAID' : 'PAID IN FULL';
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...(balanceDue > 0 ? RED : GREEN));
+    doc.text(status, 105, 244, { align: 'center' });
+
+    // ==============================
+    // FOOTER
+    // ==============================
+    doc.setDrawColor(...ORANGE);
+    doc.setLineWidth(0.6);
+    doc.line(20, 252, 190, 252);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...DARK);
+    doc.text('Thank you for your business!', 105, 263, { align: 'center' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...GRAY);
+    doc.text('This is a computer-generated payment receipt.', 105, 270, { align: 'center' });
+    doc.text(`Generated by: ${username}`, 105, 276, { align: 'center' });
+
+    // ==============================
+    // SAVE PDF
+    // ==============================
+    const safeFileName = String(r.receipt_code)
+      .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    doc.save(`${safeFileName}.pdf`);
+
+  } catch (error) {
+    console.error('Receipt PDF Error:', error);
+    alert('Unable to generate receipt PDF.\n\n' + error.message);
+  }
+}
+
+// ============ MONTHLY REPORTS (Admin only) ============
+function renderReports() {
+  if (!can('R','Reports')) {
+    document.getElementById('mainContent').innerHTML = pageHeader('Access Denied - Admin Only');
+    return;
+  }
+  const now = new Date();
+  document.getElementById('mainContent').innerHTML = `
+    ${pageHeader('Monthly Income Reports')}
+    <div class="card">
+      <div class="card-header"><h2>Generate Report</h2></div>
+      <div class="form-row">
+        <div class="form-group"><label>Month</label>
+          <select id="reportMonth">
+            ${Array.from({length:12},(_,i)=>i+1).map(m =>
+              `<option value="${m}" ${m===now.getMonth()+1?'selected':''}>${new Date(2000,m-1).toLocaleString('en',{month:'long'})}</option>`
+            ).join('')}
+          </select></div>
+        <div class="form-group"><label>Year</label>
+          <input type="number" id="reportYear" value="${now.getFullYear()}"></div>
+      </div>
+      <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+    </div>
+    <div id="reportResult"></div>
+  `;
+}
+
+async function generateReport() {
+  const month = parseInt(document.getElementById('reportMonth').value, 10);
+  const year = parseInt(document.getElementById('reportYear').value, 10);
+
+  if (!month || !year) {
+    alert('Please select a valid month and year.');
+    return;
+  }
+
+  const sales = DB.get('sales').filter(s => {
+    const d = new Date(s.sale_date);
+    return !isNaN(d.getTime()) && d.getMonth() + 1 === month && d.getFullYear() === year;
+  });
+
+  const costs = DB.get('costs').filter(c => {
+    const d = new Date(c.cost_date);
+    return !isNaN(d.getTime()) && d.getMonth() + 1 === month && d.getFullYear() === year;
+  });
+
+  const grossSales = sales.reduce((sum, x) => sum + (Number(x.subtotal) || 0), 0);
+  const serviceCharges = sales.reduce((sum, x) => sum + (Number(x.service_charge_amount) || 0), 0);
+  const totalCosts = costs.reduce((sum, x) => sum + (Number(x.total_price) || 0), 0);
+  const totalCommissions = sales.reduce((sum, x) => sum + (Number(x.commission_amount) || 0), 0);
+  const netProfit = grossSales - serviceCharges - totalCosts - totalCommissions;
+
+  const reports = DB.get('reports');
+  const reportCode = `INC-${year}-${String(month).padStart(2, '0')}-${String(reports.length + 1).padStart(4, '0')}`;
+
+  const report = {
+    report_id: reports.length + 1,
+    report_code: reportCode,
+    report_month: month,
+    report_year: year,
+    total_gross_sales: grossSales,
+    total_service_charges: serviceCharges,
+    total_costs: totalCosts,
+    total_commissions: totalCommissions,
+    net_profit: netProfit,
+    generated_by: currentUser?.user_id || '',
+    generated_at: new Date().toISOString()
+  };
+
+  reports.push(report);
+  DB.set('reports', reports);
+
+  try {
+    await saveToGoogle('addReport', report);
+  } catch (e) {
+    console.error('Report Google save failed:', e);
+  }
+
+  document.getElementById('reportResult').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h2>Daily Sales Income vs Cost</h2>
+      </div>
+
+      <div style="height:380px; position:relative;">
+        <canvas id="reportMonthlyChart"></canvas>
+      </div>
+
+      <small style="color:#6b7280;display:block;margin-top:8px;">
+        X-axis = Date | Y-axis = Total Amount (Rs.) | Selected Month: ${new Date(year, month - 1).toLocaleString('en', { month: 'long' })} ${year}
+      </small>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Report: ${reportCode}</h2>
+        <button class="btn btn-info" onclick="exportReportPDF('${reportCode}')">Export PDF</button>
+      </div>
+
+      <div class="table-wrap"><table>
+        <tr><td>Report ID</td><td><b>${reportCode}</b></td></tr>
+        <tr><td>Period</td><td>${new Date(year, month - 1).toLocaleString('en', { month: 'long' })} ${year}</td></tr>
+        <tr><td>Total Gross Sales</td><td>Rs. ${grossSales.toLocaleString()}</td></tr>
+        <tr><td>Total Service Charges</td><td>Rs. ${serviceCharges.toFixed(2)}</td></tr>
+        <tr><td>Total Costs/Expenses</td><td>Rs. ${totalCosts.toLocaleString()}</td></tr>
+        <tr><td>Total Commissions</td><td>Rs. ${totalCommissions.toFixed(2)}</td></tr>
+        <tr style="background:#fef3c7"><td><b>Net Profit</b></td><td><b>Rs. ${netProfit.toFixed(2)}</b></td></tr>
+      </table>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const canvas = document.getElementById('reportMonthlyChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const data = monthlySeries(month, year);
+
+    if (reportChartInstance) {
+      reportChartInstance.destroy();
+      reportChartInstance = null;
+    }
+
+    reportChartInstance = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: data.labels,
+        datasets: [
+          {
+            label: 'Sales Income',
+            data: data.income,
+            borderWidth: 3,
+            tension: 0.25,
+            fill: false,
+            pointRadius: 3,
+            pointHoverRadius: 6
+          },
+          {
+            label: 'Cost',
+            data: data.cost,
+            borderWidth: 3,
+            tension: 0.25,
+            fill: false,
+            pointRadius: 3,
+            pointHoverRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: Rs. ${Number(context.raw || 0).toLocaleString('en-LK', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Date'
+            },
+            ticks: {
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Total Amount (Rs.)'
+            },
+            ticks: {
+              callback: function(value) {
+                return 'Rs. ' + Number(value).toLocaleString('en-LK');
+              }
+            }
+          }
+        }
+      }
+    });
+  }, 0);
+}
+
+function exportReportPDF(code) {
+  const r = DB.get('reports').find(x => x.report_code === code);
+  if (!r) { alert('Report not found.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const year = Number(r.report_year);
+  const month = Number(r.report_month);
+  const monthName = new Date(year, month-1, 1).toLocaleString('en-US',{month:'long'});
+  const sales = DB.get('sales').filter(s => { const d=new Date(s.sale_date); return d.getFullYear()===year && d.getMonth()+1===month; });
+  const costs = DB.get('costs').filter(c => { const d=new Date(c.cost_date); return d.getFullYear()===year && d.getMonth()+1===month; });
+  const days = new Date(year,month,0).getDate();
+  const daily=[];
+  for(let day=1;day<=days;day++){
+    const si=sales.filter(s=>new Date(s.sale_date).getDate()===day).reduce((n,x)=>n+Number(x.total_amount||0),0);
+    const co=costs.filter(c=>new Date(c.cost_date).getDate()===day).reduce((n,x)=>n+Number(x.total_price||0),0);
+    if(si||co) daily.push([String(day).padStart(2,'0'),si.toFixed(2),co.toFixed(2),(si-co).toFixed(2)]);
+  }
+  doc.setFontSize(20); doc.setTextColor(217,119,6); doc.text('Seeman Foods',105,18,{align:'center'});
+  doc.setFontSize(9); doc.setTextColor(70,70,70); doc.text('195/B Aluboghalanda Pinnawala South, Waga',105,25,{align:'center'}); doc.text('+94 77 754 9425',105,31,{align:'center'});
+  doc.setDrawColor(180,180,180); doc.line(20,35,190,35);
+  doc.setTextColor(0,0,0); doc.setFontSize(15); doc.setFont(undefined,'bold'); doc.text('Monthly Income Report',105,46,{align:'center'});
+  doc.setFontSize(11); doc.text(`${monthName} ${year}`,105,54,{align:'center'}); doc.setFont(undefined,'normal');
+  doc.setFontSize(10); let y=68;
+  const summary=[['Report Code',r.report_code],['Gross Sales','Rs. '+Number(r.total_gross_sales||0).toLocaleString()],['Service Charges','Rs. '+Number(r.total_service_charges||0).toFixed(2)],['Total Costs','Rs. '+Number(r.total_costs||0).toLocaleString()],['Commissions','Rs. '+Number(r.total_commissions||0).toFixed(2)]];
+  summary.forEach(([k,v])=>{doc.setFont(undefined,'bold');doc.text(k+':',25,y);doc.setFont(undefined,'normal');doc.text(String(v),95,y);y+=8;});
+  doc.setFillColor(245,245,245); doc.roundedRect(20,y-5,170,18,3,3,'F'); doc.setFont(undefined,'bold'); doc.text('NET PROFIT',30,y+7); doc.text('Rs. '+Number(r.net_profit||0).toLocaleString(),130,y+7); y+=22;
+  if(doc.autoTable){ doc.autoTable({startY:y,head:[['Date','Sales Income (Rs.)','Cost (Rs.)','Net (Rs.)']],body:daily.length?daily:[['-','0.00','0.00','0.00']],theme:'grid',styles:{fontSize:9,cellPadding:3},headStyles:{fillColor:[217,119,6]}}); }
+  y=(doc.lastAutoTable?.finalY||y+25)+12;
+  doc.setFontSize(9); doc.setFont(undefined,'bold'); doc.text('Monthly Totals',20,y); y+=7; doc.setFont(undefined,'normal'); doc.text('Sales Income: Rs. '+Number(r.total_gross_sales||0).toLocaleString(),20,y); doc.text('Costs: Rs. '+Number(r.total_costs||0).toLocaleString(),110,y); y+=8;
+  doc.setFontSize(8); doc.setTextColor(110,110,110); doc.text(`Generated by: ${currentUser?.username||'System'}`,20,280); doc.text(new Date().toLocaleString(),190,280,{align:'right'});
+  doc.save(`${r.report_code}.pdf`);
+}
+
+// ============ UTILITIES ============
+function showModal() { document.getElementById('modalOverlay').classList.add('active'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+async function deleteRecord(table, id) {
+  const moduleMap = { sales:'Sales', costs:'Costs', customers:'Customers', orders:'Orders', users:'Users', payments:'Payments', receipts:'Receipts' };
+  if (!can('D', moduleMap[table])) { alert('Access denied'); return; }
+  if (!confirm('Are you sure you want to delete this record?')) return;
+  const idField = table === 'sales' ? 'sales_id' : table === 'costs' ? 'cost_id' : table === 'customers' ? 'customer_id' : table === 'orders' ? 'order_id' : table === 'users' ? 'user_id' : table === 'payments' ? 'payment_id' : 'receipt_id';
+  const records = DB.get(table);
+  const deleted = records.find(r => r[idField] === id);
+  DB.set(table, records.filter(r => r[idField] !== id));
+  if (googleReady && deleted) {
+    const actionMap = { sales:'deleteSale', costs:'deleteCost', customers:'deleteCustomer', orders:'deleteOrder', users:'deleteUser', payments:'deletePayment', receipts:'deleteReceipt' };
+    if (actionMap[table]) {
+      await apiPost(actionMap[table], { [idField]: id });
+      await new Promise(r => setTimeout(r, 500));
+      await loadFromGoogleSheets(false);
+    }
+  }
+  navigate(table);
+}
+
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'modalOverlay') closeModal();
+});
+</script>
 </body>
 </html>
