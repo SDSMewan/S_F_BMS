@@ -19,7 +19,7 @@ const HEADERS = {
     'user_id',
     'full_name',
     'username',
-    'password_hash',
+    'password',
     'role',
     'email',
     'contact',
@@ -1615,37 +1615,6 @@ function addReport(d) {
 
 
 /* ==================================================
-   PASSWORD SECURITY
-================================================== */
-
-function isSha256Hash(value) {
-  return /^[a-f0-9]{64}$/i.test(String(value || '').trim());
-}
-
-function sha256Hex(value) {
-  const bytes = Utilities.computeDigest(
-    Utilities.DigestAlgorithm.SHA_256,
-    String(value || ''),
-    Utilities.Charset.UTF_8
-  );
-
-  return bytes.map(function(b) {
-    const v = b < 0 ? b + 256 : b;
-    return ('0' + v.toString(16)).slice(-2);
-  }).join('');
-}
-
-function normalizeUserPasswordHash(d) {
-  if (d.password_hash && isSha256Hash(d.password_hash)) {
-    return String(d.password_hash).toLowerCase();
-  }
-  if (d.password) {
-    return sha256Hex(d.password);
-  }
-  return '';
-}
-
-/* ==================================================
    USERS
 ================================================== */
 
@@ -1692,8 +1661,8 @@ function addUser(d) {
     username:
       username,
 
-    password_hash:
-      normalizeUserPasswordHash(d),
+    password:
+      d.password || '',
 
     role:
       d.role || 'Staff',
@@ -2076,17 +2045,6 @@ function setupSheets() {
   const users =
     read('users');
 
-  /* Migrate old plain-text passwords to SHA-256 hashes. */
-  users.forEach(function(user) {
-    const currentHash = String(user.password_hash || '').trim();
-    if (!isSha256Hash(currentHash) && user.password) {
-      const row = findRow('users', 'user_id', user.user_id);
-      if (row) {
-        setByHeader('users', row, { password_hash: sha256Hex(user.password) });
-      }
-    }
-  });
-
   if (!users.length) {
 
     appendByHeader(
@@ -2095,7 +2053,7 @@ function setupSheets() {
         user_id: 1,
         full_name: 'System Admin',
         username: 'admin',
-        password_hash: sha256Hex('admin123'),
+        password: 'admin123',
         role: 'Admin',
         email: 'admin@seemanfoods.lk',
         contact: '0771234567',
@@ -2110,7 +2068,7 @@ function setupSheets() {
         user_id: 2,
         full_name: 'Kamal Perera',
         username: 'staff',
-        password_hash: sha256Hex('staff123'),
+        password: 'staff123',
         role: 'Staff',
         email: 'kamal@seemanfoods.lk',
         contact: '0779876543',
